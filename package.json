@@ -1,0 +1,22 @@
+{
+	"name" : "simplebench",
+	"description" : "Tail call optimized benchmarking tool for async and sync javascript. This can be used for both asynchronous and synchronous performance testing.",
+	"author" : "Owen Allen <owenallenaz@gmail.com>",
+	"version" : "0.0.1",
+	"dependencies" : {
+		"async" : "*",
+		"microtime" : "*"
+	},
+	"devDependencies" : {
+		"mocha" : "*"
+	},
+	"engines" : { "node" : ">=7.10.0" },
+	"scripts" : {
+		"test" : "mocha $(find testing/ -name *.test.js) -R spec --colors --check-leaks --harmony"
+	},
+	"repository" : {
+		"type" : "git",
+		"url" : "https://github.com/simpleviewinc/simplebench.git"
+	},
+	"license" : "MIT"
+}
