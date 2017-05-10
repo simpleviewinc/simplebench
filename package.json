@@ -2,7 +2,7 @@
 	"name" : "simplebench",
 	"description" : "Tail call optimized benchmarking tool for async and sync javascript. This can be used for both asynchronous and synchronous performance testing.",
 	"author" : "Owen Allen <owenallenaz@gmail.com>",
-	"version" : "0.0.3",
+	"version" : "0.0.4",
 	"dependencies" : {
 		"async" : "*",
 		"microtime" : "*",

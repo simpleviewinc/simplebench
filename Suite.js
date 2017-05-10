@@ -51,6 +51,7 @@ Suite.prototype.run = function(cb) {
 		if (err) { return cb(err); }
 		
 		var results = {
+			suiteArgs : self._args,
 			date : self._now.format("LLLL"),
 			results : [],
 			os : {
