@@ -14,8 +14,11 @@ var argTypes = {
 	saveFilename : String
 }
 
+var pathBreakdown = filePath.match(/(.*)\/(.*)$/);
+
 var suiteArgs = {
-	saveFileRoot : filePath.match(/.*\/(.*)$/)[1]
+	savePath : pathBreakdown[1] + "/",
+	saveFileRoot : pathBreakdown[2]
 };
 
 args.forEach(function(val) {
