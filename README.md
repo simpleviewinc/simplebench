@@ -25,11 +25,11 @@ suite.add("for", function(done) {
 ```
 
 ```
-: simplebench ./examples/example_cli.js
+: ./bin/simplebench ./examples/example_cli.js
 for - count: 2391635, ops/sec: 2391635
 forEach - count: 1477829, ops/sec: 1477829
 
-: simplebench ./examples/example_cli.js --compare
+: ./bin/simplebench ./examples/example_cli.js --compare
 Winner - for
 
 for - count: 2381534, ops/sec: 2381534
