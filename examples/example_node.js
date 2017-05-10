@@ -1,7 +1,7 @@
-var simplebench = require("./index.js");
+var simplebench = require("../index.js"); // change this path to "simplebench" for your usecase
 
 var arr = [1,2,3,4,5];
-var suite = new simplebench.Suite();
+var suite = new simplebench.Suite({ compare : true });
 suite.add("forEach", function(done) {
 	arr.forEach(function(val) {});
 	return done();

@@ -6,7 +6,7 @@ var assert = require("assert");
 
 describe(__filename, function() {
 	it("should init and run", function(done) {
-		var suite = new simplebench.Suite({ duration : 100 * 1000 });
+		var suite = new simplebench.Suite({ duration : 100 * 1000, compare : true });
 		suite.add("test1", function(done) {
 			var start = Date.now();
 			while(Date.now() - start < 10) {}
@@ -36,7 +36,7 @@ describe(__filename, function() {
 	});
 	
 	it("should run with only one test", function(done) {
-		var suite = new simplebench.Suite();
+		var suite = new simplebench.Suite({ compare : true });
 		suite.add("test1", function(done) {
 			setTimeout(function() {
 				return done();
@@ -68,7 +68,7 @@ describe(__filename, function() {
 	});
 	
 	it("microtime comparable to process.hrtime", function(done) {
-		var suite = new simplebench.Suite({ duration : 500 * 1000 });
+		var suite = new simplebench.Suite({ duration : 500 * 1000, compare : true });
 		suite.add("microtime", function(done) {
 			var temp = microtime.now();
 			return done();
@@ -90,7 +90,7 @@ describe(__filename, function() {
 	
 	it("array loop constructs", function(done) {
 		var arr = [1,2,3,4];
-		var suite = new simplebench.Suite({ duration : 100 * 1000 });
+		var suite = new simplebench.Suite({ duration : 100 * 1000, compare : true });
 		suite.add("forEach", function(done) {
 			arr.forEach(function(val) {});
 			
