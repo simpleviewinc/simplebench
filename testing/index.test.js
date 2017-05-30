@@ -25,11 +25,11 @@ describe(__filename, function() {
 			assert.ifError(err);
 			
 			assert.strictEqual(results.winner, "test2");
-			assert.ok(results.winnerCount >= 18 && results.winnerCount <= 22);
+			assert.ok(results.winnerCount >= 18 && results.winnerCount <= 22, results.winnerCount);
 			assert.strictEqual(results.results[0].diff, undefined);
-			assert.ok(results.results[0].opsSec >= 190 && results.results[0].opsSec <= 210);
-			assert.ok(results.results[1].diff >= -55 && results.results[1].diff <= -45);
-			assert.ok(results.results[1].opsSec >= 90 && results.results[1].opsSec <= 110);
+			assert.ok(results.results[0].opsSec >= 190 && results.results[0].opsSec <= 210, results.results[0].opsSec);
+			assert.ok(results.results[1].diff >= -55 && results.results[1].diff <= -45, results.results[1].diff);
+			assert.ok(results.results[1].opsSec >= 90 && results.results[1].opsSec <= 110, results.results[1].opsSec);
 			
 			done();
 		});
@@ -82,7 +82,7 @@ describe(__filename, function() {
 		suite.run(function(err, results) {
 			assert.ifError(err);
 			
-			assert.ok(results.results[1].diff >= -15);
+			assert.ok(results.results[1].diff >= -15, results.results[1].diff);
 			
 			done();
 		});
