@@ -5,7 +5,6 @@
 	"version" : "0.0.4",
 	"dependencies" : {
 		"async" : "*",
-		"microtime" : "*",
 		"moment" : "*"
 	},
 	"devDependencies" : {
@@ -13,7 +12,7 @@
 	},
 	"engines" : { "node" : ">=7.10.0" },
 	"scripts" : {
-		"test" : "mocha $(find testing/ -name *.test.js) -R spec --colors --check-leaks --harmony"
+		"test" : "mocha $(find testing/ -name *.test.js) -R spec --colors --check-leaks --harmony --harmony-tailcalls"
 	},
 	"repository" : {
 		"type" : "git",

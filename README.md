@@ -86,7 +86,7 @@ suite.run(function(err, results) {
 
 ```
 // execute
-: node --harmony --use-strict ./examples/example_node.js
+: node --harmony --harmony-tailcalls --use-strict ./examples/example_node.js
 Winner - for
 
 Results:
@@ -94,11 +94,11 @@ for - count: 2427560, ops/sec: 2427560
 forEach - count: 1491169, ops/sec: 1491169, diff: -38.57%
 ```
 
-As of Node 7.10.0, in order to enable tail call optimization you will need to start your node file with `--harmony`. If you do not utilize "use strict" in your test file, you can also start with `--use-strict` to enable it process-wide. If both settings are not exampled, it will not be possible to utilize TCO and you may need to use `bounce` to avoid max call stack.
+As of Node 7.10.0, in order to enable tail call optimization you will need to start your node file with `--harmony --harmony-tailcalls`. If you do not utilize "use strict" in your test file, you can also start with `--use-strict` to enable it process-wide. If both settings are not enabled, it will not be possible to utilize TCO and you may need to use the Suite argument `bounce` to avoid max call stack errors.
 
 ```
 // execute
-: node --harmony --use-strict example.js
+: node --harmony --harmony-tailcalls --use-strict example.js
 Winner - for
 
 Results:
@@ -116,7 +116,7 @@ The suite is the primary mechanism you will use for creating comparison tests.
 
 Create a new test suite with specific arguments.
 
-* duration - `number` - default `1000 * 1000` (1 second) - Duration in microseconds for each test in the suite to run. In example, for a test to run for 500ms, you will want to pass `500 * 1000`.
+* duration - `number` - default `1000` (1 second) - Duration in milliseconds for each test in the suite to run.
 * bounce - `boolean` - default `false` - Whether to bounce off the event loop. For functions which are not TCO, if they do not bounce off the loop after X iterations, they can stack overflow. The preferred option is making it TCO. If that's not available, then you can enable bounce.
 * bounceEvery - `number` - default `1000` - After X iterations it will bounce off the event loop. Needed when TCO cannot be utilized.
 * compare - `boolean` - default `false` - Compare the results from the different tests.

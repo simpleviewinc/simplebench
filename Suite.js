@@ -1,7 +1,6 @@
 "use strict";
 
 var async = require("async");
-var microtime = require("microtime");
 var moment = require("moment");
 var fs = require("fs");
 var os = require("os");
@@ -12,7 +11,7 @@ var Suite = function(args) {
 	self._now = moment();
 	
 	self._args = args || {};
-	self._args.duration = self._args.duration || (1000 * 1000); // duration is in microseconds, default to 1 second
+	self._args.duration = (self._args.duration || (1000)) * 1000; // duration in milliseconds, converted to microseconds
 	self._args.bounce = self._args.bounce !== undefined ? self._args.bounce : false;
 	self._args.bounceEvery = self._args.bounceEvery || 1000;
 	self._args.compare = self._args.compare !== undefined ? self._args.compare : false;
@@ -113,16 +112,22 @@ Suite.prototype.saveResults = function(results, cb) {
 	return fs.writeFile(`${self._args.savePath}${self._args.saveFilename}`, JSON.stringify(results, null, "\t"), cb);
 }
 
+// return microsecond difference between two hrtimes
+var _diffHrtime = function(hrtime) {
+	var diff = process.hrtime(hrtime);
+	return (diff[0] * 1000000) + (diff[1] / 1000);
+}
+
 //// private
 Suite.prototype._runTest = function(fn, cb) {
 	var self = this;
 	
 	var count = 0;
-	var start = microtime.now();
+	var start = process.hrtime();
 	
 	var runCb = function() {
-		var now = microtime.now();
-		if (now - start > self._args.duration) {
+		var diff = _diffHrtime(start);
+		if (diff > self._args.duration) {
 			return cb(null, count);
 		}
 		

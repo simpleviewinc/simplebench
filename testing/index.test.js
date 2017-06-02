@@ -1,12 +1,11 @@
 "use strict";
 
 var simplebench = require("../index.js");
-var microtime = require("microtime");
 var assert = require("assert");
 
 describe(__filename, function() {
 	it("should init and run", function(done) {
-		var suite = new simplebench.Suite({ duration : 100 * 1000, compare : true });
+		var suite = new simplebench.Suite({ duration : 100, compare : true });
 		suite.add("test1", function(done) {
 			var start = Date.now();
 			while(Date.now() - start < 10) {}
@@ -25,11 +24,11 @@ describe(__filename, function() {
 			assert.ifError(err);
 			
 			assert.strictEqual(results.winner, "test2");
-			assert.ok(results.winnerCount >= 18 && results.winnerCount <= 22);
+			assert.ok(results.winnerCount >= 18 && results.winnerCount <= 22, results.winnerCount);
 			assert.strictEqual(results.results[0].diff, undefined);
-			assert.ok(results.results[0].opsSec >= 190 && results.results[0].opsSec <= 210);
-			assert.ok(results.results[1].diff >= -55 && results.results[1].diff <= -45);
-			assert.ok(results.results[1].opsSec >= 90 && results.results[1].opsSec <= 110);
+			assert.ok(results.results[0].opsSec >= 180 && results.results[0].opsSec <= 220, results.results[0].opsSec);
+			assert.ok(results.results[1].diff >= -60 && results.results[1].diff <= -40, results.results[1].diff);
+			assert.ok(results.results[1].opsSec >= 90 && results.results[1].opsSec <= 110, results.results[1].opsSec);
 			
 			done();
 		});
@@ -47,7 +46,7 @@ describe(__filename, function() {
 			assert.ifError(err);
 			
 			assert.strictEqual(results.winner, "test1");
-			assert.ok(results.winnerCount >= 90 && results.winnerCount <= 110);
+			assert.ok(results.winnerCount >= 90 && results.winnerCount <= 110, results.winnerCount);
 			
 			done();
 		});
@@ -67,30 +66,9 @@ describe(__filename, function() {
 		});
 	});
 	
-	it("microtime comparable to process.hrtime", function(done) {
-		var suite = new simplebench.Suite({ duration : 500 * 1000, compare : true });
-		suite.add("microtime", function(done) {
-			var temp = microtime.now();
-			return done();
-		});
-		
-		suite.add("hrtime", function(done) {
-			var temp = process.hrtime();
-			return done();
-		});
-		
-		suite.run(function(err, results) {
-			assert.ifError(err);
-			
-			assert.ok(results.results[1].diff >= -15);
-			
-			done();
-		});
-	});
-	
 	it("array loop constructs", function(done) {
 		var arr = [1,2,3,4];
-		var suite = new simplebench.Suite({ duration : 100 * 1000, compare : true });
+		var suite = new simplebench.Suite({ duration : 100, compare : true });
 		suite.add("forEach", function(done) {
 			arr.forEach(function(val) {});
 			
