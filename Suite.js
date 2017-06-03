@@ -25,19 +25,81 @@ var Suite = function(args) {
 		console.log("Using args", self._args);
 	}
 	
-	self.tests = {};
+	self._groups = {
+		default : {
+			tests : {}
+		}
+	};
+	
+	self.skip = {
+		add : function() {},
+		group : function() {}
+	}
+}
+
+Suite.prototype.group = function(name, fn) {
+	var self = this;
+	
+	if (self._group !== undefined) { throw new Error("Cannot nest a group within a group"); }
+	
+	self._groups[name] = self._group = {
+		tests : {}
+	}
+	
+	fn();
+	
+	self._group = undefined;
 }
 
 Suite.prototype.add = function(name, fn) {
 	var self = this;
 	
-	self.tests[name] = fn;
+	var group = self._group !== undefined ? self._group : self._groups.default;
+	
+	group.tests[name] = fn;
 }
 
 Suite.prototype.run = function(cb) {
 	var self = this;
 	
-	async.mapValuesSeries(self.tests, function(test, key, cb) {
+	if (Object.keys(self._groups).length > 1 && Object.keys(self._groups.default.tests).length > 0) {
+		throw new Error("If using suite.group(), all tests must be within a group");
+	}
+	
+	for(var i in self._groups) {
+		if (Object.keys(self._groups[i].tests).length === 0) {
+			delete self._groups[i];
+		}
+	}
+	
+	async.mapValuesSeries(self._groups, function(group, name, cb) {
+		return self._runGroup(group, cb);
+	}, function(err, groupResults) {
+		if (err) { return cb(err); }
+		
+		var results = {
+			suiteArgs : self._args,
+			date : self._now.format("LLLL"),
+			os : {
+				cpus : os.cpus(),
+				totalmem : os.totalmem(),
+			},
+			process : {
+				version : process.version,
+				versions : process.versions
+			}
+		}
+		
+		results.groups = groupResults;
+		
+		cb(null, results);
+	});
+}
+
+Suite.prototype._runGroup = function(group, cb) {
+	var self = this;
+	
+	async.mapValuesSeries(group.tests, function(test, key, cb) {
 		self._runTest(test, function(err, data) {
 			if (err) { return cb(err); }
 			
@@ -49,19 +111,10 @@ Suite.prototype.run = function(cb) {
 	}, function(err, temp) {
 		if (err) { return cb(err); }
 		
+		
 		var results = {
-			suiteArgs : self._args,
-			date : self._now.format("LLLL"),
-			results : [],
-			os : {
-				cpus : os.cpus(),
-				totalmem : os.totalmem(),
-			},
-			process : {
-				version : process.version,
-				versions : process.versions
-			}
-		};
+			results : []
+		}
 		
 		if (self._args.compare === true) {
 			results.winner = undefined;
@@ -97,12 +150,18 @@ Suite.prototype.run = function(cb) {
 Suite.prototype.report = function(results) {
 	var self = this;
 	
-	if (self._args.compare) {
-		console.log(`Winner - ${results.winner}\n`);
-	}
-	
-	for(var value of results.results) {
-		console.log(`${value.name} - count: ${value.count}, ops/sec: ${value.opsSec}${value.diffString}`);
+	for(var groupName in results.groups) {
+		var group = results.groups[groupName];
+		
+		console.log("Group: ", groupName);
+		
+		if (self._args.compare) {
+			console.log(`Winner - ${group.winner}\n`);
+		}
+		
+		for(var value of group.results) {
+			console.log(`${value.name} - count: ${value.count}, ops/sec: ${value.opsSec}${value.diffString}`);
+		}
 	}
 }
 

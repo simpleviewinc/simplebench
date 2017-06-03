@@ -2,6 +2,7 @@
 
 var simplebench = require("../index.js");
 var assert = require("assert");
+var child_process = require("child_process");
 
 describe(__filename, function() {
 	it("should init and run", function(done) {
@@ -22,6 +23,8 @@ describe(__filename, function() {
 		
 		suite.run(function(err, results) {
 			assert.ifError(err);
+			
+			results = results.groups.default;
 			
 			assert.strictEqual(results.winner, "test2");
 			assert.ok(results.winnerCount >= 18 && results.winnerCount <= 22, results.winnerCount);
@@ -44,6 +47,8 @@ describe(__filename, function() {
 		
 		suite.run(function(err, results) {
 			assert.ifError(err);
+			
+			results = results.groups.default;
 			
 			assert.strictEqual(results.winner, "test1");
 			assert.ok(results.winnerCount >= 90 && results.winnerCount <= 110, results.winnerCount);
@@ -105,9 +110,141 @@ describe(__filename, function() {
 		suite.run(function(err, results) {
 			assert.ifError(err);
 			
+			results = results.groups.default;
+			
 			assert.strictEqual(results.winner, "for");
 			
 			done();
+		});
+	});
+	
+	it("should allow groups", function(done) {
+		var arr = [1,2,3,4];
+		
+		var arrLarge = [];
+		for(var i = 0; i < 10000; i++) {
+			arrLarge.push(i);
+		}
+		
+		var suite = new simplebench.Suite({ duration : 100, compare : true });
+		suite.group("small", function() {
+			suite.add("forEach", function(done) {
+				arr.forEach(function(val) {});
+				
+				return done();
+			});
+			
+			suite.add("for", function(done) {
+				for(var i = 0; i < arr.length; i++) {
+					var val = arr[i];
+				}
+				
+				return done();
+			});
+		});
+		
+		suite.group("large", function() {
+			suite.add("forEach", function(done) {
+				arrLarge.forEach(function(val) {});
+				
+				return done();
+			});
+			
+			suite.add("for", function(done) {
+				for(var i = 0; i < arrLarge.length; i++) {
+					var val = arrLarge[i];
+				}
+				
+				return done();
+			});
+		});
+		
+		suite.run(function(err, results) {
+			assert.ifError(err);
+			
+			assert.deepStrictEqual(Object.keys(results.groups), ["small", "large"]);
+			assert.strictEqual(results.groups.small.winner, "for");
+			assert.strictEqual(results.groups.large.winner, "for");
+			
+			return done();
+		});
+	});
+	
+	it("should allow skip", function(done) {
+		var suite = new simplebench.Suite({ duration : 100 });
+		suite.add("test1", function(done) {
+			return done();
+		});
+		
+		suite.skip.add("test2", function(done) {
+			throw new Error("not called");
+		});
+		
+		suite.run(function(err, results) {
+			assert.ifError(err)
+			
+			assert.strictEqual(results.groups.default.results.length, 1);
+			
+			return done();
+		});
+	});
+	
+	it("should throw if mixing groups and not groups", function(done) {
+		var suite = new simplebench.Suite();
+		
+		suite.add("test1", function(done) {
+			throw new Error("invalid");
+		});
+		
+		suite.group("foo", function() {
+			suite.add("test2", function(done) {
+				throw new Error("invalid");
+			});
+		});
+		
+		assert.throws(function() {
+			suite.run(done);
+		}, /If using suite\.group\(\), all tests must be within a group/);
+		
+		return done();
+	});
+	
+	it("should throw if nesting a group in a group", function(done) {
+		var suite = new simplebench.Suite();
+		suite.group("foo", function() {
+			assert.throws(function() {
+				suite.group("bar", function() {});
+			}, /Cannot nest a group within a group/);
+			
+			return done();
+		});
+	});
+	
+	describe("cli", function() {
+		var pathTests = [
+			{
+				path : "./_cli_test.js",
+			},
+			{
+				path : __dirname + "/_cli_test.js"
+			},
+			{
+				path : "_cli_test.js"
+			}
+		];
+		
+		pathTests.forEach(function(test) {
+			it(test.path, function(done) {
+				var child_process = require("child_process");
+				
+				child_process.exec(`${__dirname}/../bin/simplebench ${test.path} --compare --duration=100`, { cwd : __dirname }, function(err, stdout, stderr) {
+					assert.ifError(err);
+					
+					assert.ok(stdout.replace(/\s+/g, " ").match(/Group: default Winner - for for - count: \d+, ops\/sec: \d+ forEach - count: \d+, ops\/sec: \d+, diff: -\d+.\d+%/));
+					
+					return done();
+				});
+			});
 		});
 	});
 });

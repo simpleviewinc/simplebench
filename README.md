@@ -139,11 +139,61 @@ Add a test to the suite. The same name can only occur in each suite once.
 * name - `string` - The name of the test
 * cb - `function` - A function which will receive a `done` function. Call it upon test completion.
 
+### Suite.prototype.group(name, cb)
+
+Add a group to a suite. All tests declared within the group will be compared against each other, but not against tests in other groups. Used for testing multiple scenarios.
+
+An example of using this would be if you were testing array loop methods, and you wanted to do comparisons of large arrays and small arrays. In that case it's obviously invalid to compare the looping of a large array vs a small array. So you'd group the large tests into a group and the small tests into a group.
+
+When using groups, all tests in your file must be within a group.
+
+* name - `string` - The name of the test
+* cb - `function` - A function which is called immediately, in which you would suite.add() the tests for that group.
+
+```js
+// when comparing, each test is only compared with the tests in it's  test1 and test2 will be compared, and test3 and test4 will be compared but test1 will not be compared to test3 or test4
+suite.group("group1", function() {
+	suite.add("test1", function(done) {
+	
+	});
+	
+	suite.add("test2", function(done) {
+		
+	});
+});
+
+suite.group("group2", function() {
+	suite.add("test3", function(done) {
+	
+	});
+	
+	suite.add("test4", function(done) {
+		
+	});
+});
+```
+
 ### Suite.prototype.run(cb)
 
 Run the test suite and determine the winner. 
 
 * cb - `function` - A function which will receive `err`, `results`. The results object is commonly passed to `suite.report(results)`. It can also be manually reported on.
+
+### Suite.prototype.skip
+
+Skip a test or group from executing.
+
+```js
+// will not execute this test
+suite.skip.add("test1", function(done) {
+
+});
+
+// will not execute this group
+suite.skip.group("group1", function(done) {
+
+});
+```
 
 ### Suite.prototype.report(results)
 
