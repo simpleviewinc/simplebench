@@ -2,7 +2,7 @@
 	"name" : "simplebench",
 	"description" : "Tail call optimized benchmarking tool for async and sync javascript. This can be used for both asynchronous and synchronous performance testing.",
 	"author" : "Owen Allen <owenallenaz@gmail.com>",
-	"version" : "0.0.7",
+	"version" : "0.0.8",
 	"dependencies" : {
 		"async" : "*",
 		"moment" : "*"
@@ -11,8 +11,7 @@
 		"mocha" : "*"
 	},
 	"bin": {
-		"simplebench": "./bin/simplebench",
-		"_simplebench": "./bin/_simplebench"
+		"simplebench": "./bin/simplebench"
 	},
 	"engines" : { "node" : ">=7.10.0" },
 	"scripts" : {
