@@ -54,7 +54,7 @@ simplebench example.js --save
 # run a benchmmark, compare and save
 simplebench example.js --save --compare
 
-# --trace-inlining, --trace-deopt and --trace-opt can be passed along as well to debug v8 optimization
+# --trace-inlining, --trace-deopt, --trace-opt, and --trace-gc can be passed along as well to debug v8 optimization
 simplebench example.js --trace-opt --trace-deopt --trace-inlining
 ```
 
