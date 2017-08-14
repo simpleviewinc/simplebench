@@ -181,29 +181,45 @@ var _diffHrtime = function(hrtime) {
 Suite.prototype._runTest = function(fn, cb) {
 	var self = this;
 	
-	var count = 0;
-	var start = process.hrtime();
-	
-	var runCb = function() {
-		var diff = _diffHrtime(start);
-		if (diff > self._args.duration) {
-			return cb(null, count);
-		}
-		
-		count++;
-		if (self._args.bounce === true && count % self._args.bounceEvery === 0) {
-			// to ensure high performance we don't want to bounce every execution, so only bounce if enabled
-			return setImmediate(run);
-		} else {
-			return run();
-		}
+	var context = {
+		count : 0,
+		start : process.hrtime(),
+		fn : fn,
+		cb : cb,
+		runTestIteration : undefined,
+		runTestCb : undefined
 	}
 	
-	var run = function() {
-		return fn(runCb);
+	context.runTestIteration = self._runTestIteration.bind(self, context);
+	context.runTestCb = self._runTestCb.bind(self, context);
+	
+	return context.runTestIteration();
+}
+
+Suite.prototype._runTestIteration = function(context) {
+	var self = this;
+	
+	return context.fn(context.runTestCb);
+}
+
+Suite.prototype._runTestCb = function(context) {
+	var self = this;
+	
+	// for some magic reason, this has to be done here, if we simply call context.cb(null, context.count) a few lines below this we get a v8 deopt with 'Insufficient type feedback for generic named access'
+	var count = context.count;
+	
+	var diff = _diffHrtime(context.start);
+	if (diff > self._args.duration) {
+		return context.cb(null, count);
 	}
 	
-	return run();
+	context.count++;
+	if (self._args.bounce === true && context.count % self._args.bounceEvery === 0) {
+		// to ensure high performance we don't want to bounce every execution, so only bounce if enabled
+		return setImmediate(context.runTestIteration);
+	} else {
+		return context.runTestIteration();
+	}
 }
 
 module.exports = Suite;
