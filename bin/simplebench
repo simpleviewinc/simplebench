@@ -6,4 +6,15 @@ var path = require("path");
 var args = process.argv.slice(2);
 var filepath = path.resolve(args.shift());
 
-child_process.spawn("node", ["--harmony", "--harmony-tailcalls", "--use-strict", `${__dirname}/_simplebench.js`, filepath, ...args], { stdio : "inherit" });
+var preArgs = ["--harmony", "--harmony-tailcalls", "--use-strict"];
+
+args = args.filter(val => {
+	if (["--trace-deopt", "--trace-opt", "--trace-inlining"].indexOf(val) > -1) {
+		preArgs.push(val);
+		return false;
+	}
+	
+	return true;
+});
+
+child_process.spawn("node", [...preArgs, `${__dirname}/_simplebench.js`, filepath, ...args], { stdio : "inherit" });
