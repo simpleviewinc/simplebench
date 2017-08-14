@@ -6,10 +6,10 @@ var path = require("path");
 var args = process.argv.slice(2);
 var filepath = path.resolve(args.shift());
 
-var preArgs = ["--harmony", "--harmony-tailcalls", "--use-strict"];
+var preArgs = ["--expose-gc", "--harmony", "--harmony-tailcalls", "--use-strict"];
 
 args = args.filter(val => {
-	if (["--trace-deopt", "--trace-opt", "--trace-inlining"].indexOf(val) > -1) {
+	if (["--trace-deopt", "--trace-opt", "--trace-inlining", "--trace-gc"].indexOf(val) > -1) {
 		preArgs.push(val);
 		return false;
 	}

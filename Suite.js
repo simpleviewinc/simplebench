@@ -103,6 +103,13 @@ Suite.prototype._runGroup = function(group, cb) {
 		self._runTest(test, function(err, data) {
 			if (err) { return cb(err); }
 			
+			if (global.gc !== undefined) {
+				// if we have the gc object available, 2 mark-and-sweep and 1 scavenge to reduce test interference
+				global.gc();
+				global.gc();
+				global.gc(true);
+			}
+			
 			// bounce off the event loop to allow some garbage collection from the last test
 			setTimeout(function() {
 				cb(null, data);
